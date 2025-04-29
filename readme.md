@@ -85,7 +85,7 @@ echo "# digital_concierge" >> README.md
 git init
 
 git add .
-git commit -m "adding frontend next react "
+git commit -m "adding frontend next react 2"
 git branch -M main
 git remote add origin https://github.com/theostamp/new_concierge_backend.git
 git push -u origin main

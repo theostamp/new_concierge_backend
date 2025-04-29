@@ -1,20 +1,16 @@
 # frontend/Dockerfile
 
-# Base image
 FROM node:20
 
-# Create app directory
 WORKDIR /app
 
-# Install app dependencies
 COPY package.json package-lock.json ./
 RUN npm install
 
-# Copy app source
 COPY . .
 
-# Expose port (Next.js runs on 3000)
+ENV NEXT_PUBLIC_API_URL=http://backend:8000/api
+
 EXPOSE 3000
 
-# Default command
 CMD ["npm", "run", "dev"]

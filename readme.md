@@ -59,7 +59,7 @@ python manage.py migrate_schemas --shared
 python manage.py migrate_schemas --tenant
 
 # Φτιάχνουμε διαχειριστή
-python manage.py createsuperuser --schema=public
+python manage.py createsuperuser 
 
 
 
@@ -85,7 +85,7 @@ echo "# digital_concierge" >> README.md
 git init
 
 git add .
-git commit -m "adding frontend next react 2"
+git commit -m "FRONTEND TEST 1"
 git branch -M main
 git remote add origin https://github.com/theostamp/new_concierge_backend.git
 git push -u origin main

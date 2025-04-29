@@ -141,9 +141,11 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
+        'anon': '1000/day',
+        'user': '1000/day',
+    },
 }
-}
+
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True

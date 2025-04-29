@@ -1,0 +1,22 @@
+from django.shortcuts import render
+
+# Create your views here.
+# backend/buildings/views.py
+
+from rest_framework import viewsets
+from .models import Building
+from .serializers import BuildingSerializer
+from rest_framework.permissions import IsAuthenticated
+
+from core.permissions import IsManagerOrSuperuser
+
+class BuildingViewSet(viewsets.ModelViewSet):
+    queryset = Building.objects.all()
+    serializer_class = BuildingSerializer
+    permission_classes = [IsAuthenticated, IsManagerOrSuperuser]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Building.objects.all()
+        return Building.objects.filter(manager=user)

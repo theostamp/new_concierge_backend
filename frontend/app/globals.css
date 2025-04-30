@@ -1,51 +1,6 @@
 /* frontend/app/globals.css */
-
-/* CSS Variables για χρώματα light/dark mode */
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-/* Βασικά styles */
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Reset για όλα τα στοιχεία */
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-/* Εξατομίκευση συνδέσμων */
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* Υποστήριξη Dark Mode */
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
-
-/* Tailwind imports (πάντα στο τέλος) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* εδώ μπορείς να προσθέσεις δικά σου global styles */

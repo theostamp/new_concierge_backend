@@ -9,5 +9,6 @@ urlpatterns = [
     path('api/', include('buildings.urls')),
     path('api/', include('tenants.urls')),
     path('api/', include('announcements.urls')),
-    path('api/', include('user_requests.urls')),  # <-- νέο
+    path('api/', include('user_requests.urls')), 
+    path('api/', include('api.urls')), # <-- νέο
 ]

@@ -61,8 +61,8 @@ python manage.py migrate_schemas --tenant
 # Φτιάχνουμε διαχειριστή
 python manage.py createsuperuser 
 
-
-
+npm install
+npm run dev 
 
 
 # Δημιουργια νεου χρηστη χειροκινητα -->

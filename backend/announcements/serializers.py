@@ -1,6 +1,7 @@
 # backend/announcements/serializers.py
 
 from rest_framework import serializers
+from django.utils import timezone
 from .models import Announcement
 
 class AnnouncementSerializer(serializers.ModelSerializer):
@@ -15,4 +16,5 @@ class AnnouncementSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'is_active']
 
     def get_is_active(self, obj):
-        return obj.is_active()
+        today = timezone.now().date()
+        return obj.published and obj.start_date <= today <= obj.end_date

@@ -1,3 +1,7 @@
-from django.shortcuts import render
+# backend/api/views.py
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
 
-# Create your views here.
+@ensure_csrf_cookie
+def csrf(request):
+    return JsonResponse({'csrfToken': request.META.get('CSRF_COOKIE')})

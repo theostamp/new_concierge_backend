@@ -148,8 +148,29 @@ REST_FRAMEWORK = {
 
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+CORS_ALLOW_HEADERS = [
+    'authorization',
+    'content-type',     
+    'x-csrftoken',
+    'x-requested-with',
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'x-xsrf-token',
+]
 
 # Custom User Model (όταν το φτιάξουμε)
 # AUTH_USER_MODEL = 'users.CustomUser'
@@ -162,3 +183,16 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'youremail@gmail.com'
 EMAIL_HOST_PASSWORD = 'yourpassword'
 DEFAULT_FROM_EMAIL = 'noreply@yourdomain.gr'
+
+
+import os
+
+CSRF_TRUSTED_ORIGINS = [
+    f"http://{host.strip()}" for host in os.getenv("CSRF_ORIGINS", "localhost:3000").split(",")
+]
+CSRF_TRUSTED_ORIGINS += [
+    f"https://{host.strip()}" for host in os.getenv("CSRF_ORIGINS", "localhost:3000").split(",")
+]
+CSRF_TRUSTED_ORIGINS += [
+    f"http://{host.strip()}" for host in os.getenv("CSRF_ORIGINS", "localhost:3000").split(",")
+]

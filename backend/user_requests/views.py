@@ -12,6 +12,7 @@ class IsOwnerOrAdmin(permissions.BasePermission):
         return request.user.is_staff or obj.created_by == request.user
 
 class UserRequestViewSet(viewsets.ModelViewSet):
+    queryset = UserRequest.objects.all() 
     serializer_class = UserRequestSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
     filter_backends = [filters.OrderingFilter]

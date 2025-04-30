@@ -61,32 +61,42 @@ export default function AnnouncementsPage() {
     <div className="p-6 max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">📢 Ανακοινώσεις</h1>
 
-      {loading ? (
-        <>
-          <AnnouncementSkeleton />
-          <AnnouncementSkeleton />
-          <AnnouncementSkeleton />
-        </>
-      ) : error ? (
-        <ErrorMessage message="Αδυναμία φόρτωσης ανακοινώσεων. Παρακαλώ δοκιμάστε ξανά αργότερα." />
-      ) : announcements.length > 0 ? (
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          {announcements.map((announcement: any) => (
-            <motion.div key={announcement.id} variants={item}>
-              <AnnouncementCard announcement={announcement} />
+      {(() => {
+        if (loading) {
+          return (
+            <>
+              <AnnouncementSkeleton />
+              <AnnouncementSkeleton />
+              <AnnouncementSkeleton />
+            </>
+          );
+        } else if (error) {
+          return (
+            <ErrorMessage message="Αδυναμία φόρτωσης ανακοινώσεων. Παρακαλώ δοκιμάστε ξανά αργότερα." />
+          );
+        } else if (announcements.length > 0) {
+          return (
+            <motion.div
+              variants={container}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              {announcements.map((announcement: any) => (
+                <motion.div key={announcement.id} variants={item}>
+                  <AnnouncementCard announcement={announcement} />
+                </motion.div>
+              ))}
             </motion.div>
-          ))}
-        </motion.div>
-      ) : (
-        <div className="text-gray-500 text-center">
-          Δεν υπάρχουν ενεργές ανακοινώσεις αυτή τη στιγμή.
-        </div>
-      )}
+          );
+        } else {
+          return (
+            <div className="text-gray-500 text-center">
+              Δεν υπάρχουν ενεργές ανακοινώσεις αυτή τη στιγμή.
+            </div>
+          );
+        }
+      })()}
 
       {!loading && lastUpdated && (
         <div className="text-xs text-gray-400 text-center mt-8">

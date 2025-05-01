@@ -55,8 +55,8 @@ python manage.py migrate_schemas --tenant
 
 
 python manage.py makemigrations
-python manage.py migrate_schemas --shared
-python manage.py migrate_schemas --tenant
+python manage.py migrate
+
 
 # Φτιάχνουμε διαχειριστή
 python manage.py createsuperuser 
@@ -85,7 +85,7 @@ echo "# digital_concierge" >> README.md
 git init
 
 git add .
-git commit -m " FRONTEND OK1"
+git commit -m " setup login OK"
 git branch -M main
 git remote add origin https://github.com/theostamp/new_concierge_backend.git
 git push -u origin main

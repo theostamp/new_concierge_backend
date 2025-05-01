@@ -3,16 +3,25 @@
 from rest_framework import viewsets, permissions, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from django.db.models import Count
 from .models import UserRequest
 from .serializers import UserRequestSerializer
+from django.utils import timezone
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    return JsonResponse({"message": "CSRF cookie set"})
+
 
 class IsOwnerOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user.is_staff or obj.created_by == request.user
 
 class UserRequestViewSet(viewsets.ModelViewSet):
-    queryset = UserRequest.objects.all() 
+    queryset = UserRequest.objects.all()
     serializer_class = UserRequestSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
     filter_backends = [filters.OrderingFilter]
@@ -22,8 +31,6 @@ class UserRequestViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = UserRequest.objects.all() if user.is_staff else UserRequest.objects.filter(created_by=user)
-
-        # annotate supporter_count ώστε να μπορεί να γίνει ordering
         queryset = queryset.annotate(supporter_count=Count('supporters'))
 
         status_param = self.request.query_params.get('status')
@@ -35,7 +42,15 @@ class UserRequestViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 
-    
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        new_id = response.data.get("id")
+        if new_id:
+            # Χτίζει το πλήρες URL του νέου αιτήματος (detail endpoint)
+            location = reverse('user-request-detail', args=[new_id], request=request)
+            response['Location'] = location
+        return response
+
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def support(self, request, pk=None):
         user_request = self.get_object()
@@ -47,9 +62,9 @@ class UserRequestViewSet(viewsets.ModelViewSet):
         else:
             user_request.supporters.add(user)
             return Response({'status': 'Υποστηρίξατε το αίτημα'}, status=status.HTTP_200_OK)
-    
-    
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+
+
+    @action(detail=False, methods=['get'], url_path='top')
     def top(self, request):
         """
         Επιστρέφει τα Top 5 αιτήματα με τους περισσότερους υποστηρικτές
@@ -57,6 +72,5 @@ class UserRequestViewSet(viewsets.ModelViewSet):
         user = request.user
         queryset = UserRequest.objects.all() if user.is_staff else UserRequest.objects.filter(created_by=user)
         queryset = queryset.annotate(supporter_count=Count('supporters')).order_by('-supporter_count', '-created_at')[:5]
-
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

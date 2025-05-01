@@ -21,6 +21,16 @@ class UserRequest(models.Model):
 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_requests')
     supporters = models.ManyToManyField(User, related_name='supported_requests', blank=True)
+    is_urgent = models.BooleanField(default=False)
+        
+    REQUEST_TYPE_CHOICES = [
+        ('maintenance', 'Συντήρηση'),
+        ('cleaning', 'Καθαριότητα'),
+        ('technical', 'Τεχνικό'),
+        ('other', 'Άλλο'),
+    ]
+    type = models.CharField(max_length=20, choices=REQUEST_TYPE_CHOICES, blank=True, null=True)
+
 
     def __str__(self):
         return f"{self.title} ({self.get_status_display()})"

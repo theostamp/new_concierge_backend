@@ -147,33 +147,53 @@ REST_FRAMEWORK = {
 }
 
 
-# CORS settings
-# CORS_ALLOW_ALL_ORIGINS = True
+# CORS
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = False
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
+
 CORS_ALLOW_HEADERS = [
-    'authorization',
-    'content-type',     
-    'x-csrftoken',
-    'x-requested-with',
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-    'x-xsrf-token',
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
 ]
 
-# Custom User Model (όταν το φτιάξουμε)
-# AUTH_USER_MODEL = 'users.CustomUser'
+CORS_EXPOSE_HEADERS = [
+    "Content-Type",
+    "X-CSRFToken",
+]  
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+# Αν είσαι σε dev (ΧΩΡΙΣ HTTPS)
+SESSION_COOKIE_SAMESITE ='Lax'  #'None' με HTTPS
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+# Αν είσαι σε production (ΜΕ HTTPS) 
+# SESSION_COOKIE_SAMESITE = 'None'
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_SAMESITE = 'None'
+
 AUTH_USER_MODEL = 'users.CustomUser'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -196,3 +216,8 @@ CSRF_TRUSTED_ORIGINS += [
 CSRF_TRUSTED_ORIGINS += [
     f"http://{host.strip()}" for host in os.getenv("CSRF_ORIGINS", "localhost:3000").split(",")
 ]
+
+CSRF_COOKIE_HTTPONLY = False   # πρέπει να είναι False για να το διαβάζει JS
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_COOKIE_SAMESITE = "None"  # για να δουλεύει το CORS
+CSRF_COOKIE_SECURE = False  # πρέπει να είναι True αν έχεις HTTPS   

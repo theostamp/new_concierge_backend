@@ -5,6 +5,14 @@ from .models import Announcement
 from .serializers import AnnouncementSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from core.permissions import IsManagerOrSuperuser
+from django.utils import timezone
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    return JsonResponse({"message": "CSRF cookie set"})
+
 
 class AnnouncementViewSet(viewsets.ModelViewSet):
     queryset = Announcement.objects.all()

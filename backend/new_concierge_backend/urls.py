@@ -5,10 +5,14 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('users.urls')),
-    path('api/', include('buildings.urls')),
-    path('api/', include('tenants.urls')),
-    path('api/', include('announcements.urls')),
-    path('api/', include('user_requests.urls')), 
-    path('api/', include('api.urls')), # <-- νέο
+    
+    path('api/users/', include('users.urls')),
+    path('api/buildings/', include('buildings.urls')),
+    path('api/tenants/', include('tenants.urls')),
+    path('api/announcements/', include('announcements.urls')),
+    path('api/user-requests/', include('user_requests.urls')),
+    path('api/votes/', include('votes.urls')),  # ✅ ΠΡΟΣΤΕΘΗΚΕ ΕΔΩ
+    path('api/', include('core.urls')),
 ]
+
+   

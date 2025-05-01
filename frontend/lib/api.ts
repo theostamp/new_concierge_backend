@@ -1,5 +1,5 @@
-
 // C:\Users\Notebook\new_concierge\frontend\lib\api.ts
+
 /* =========================================================================
    ΤΥΠΟΙ ΔΕΔΟΜΕΝΩΝ
    ========================================================================= */
@@ -49,8 +49,16 @@
     type?: string;
   };
   
+  export type User = {
+    id: number;
+    username: string;
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+  };
+  
   /* =========================================================================
-     ΒΟΗΘΗΤΙΚΟ – έλεγχος απόκρισης
+     ΒΟΗΘΗΤΙΚΑ
      ========================================================================= */
   
   async function check(res: Response) {
@@ -61,23 +69,40 @@
     return res;
   }
   
+  function getCookie(name: string): string | null {
+    const regex = new RegExp(`(^| )${name}=([^;]+)`);
+    const match = regex.exec(document.cookie);
+    return match ? match[2] : null;
+  }
+  
+  export async function csrfFetch(input: RequestInfo, init: RequestInit = {}) {
+    const headers = {
+      ...(init.headers || {}),
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken') ?? '',
+    };
+  
+    return fetch(input, {
+      ...init,
+      headers,
+      credentials: 'include',
+    }).then(check);
+  }
+  
   /* =========================================================================
      ΑΝΑΚΟΙΝΩΣΕΙΣ
      ========================================================================= */
   
   export async function fetchAnnouncements(): Promise<Announcement[]> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/announcements/`, {
-      cache: 'no-store',
-      credentials: 'include',
-    }).then(check);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/announcements/`,
+      { cache: 'no-store', credentials: 'include' }
+    ).then(check);
   
     const json = await res.json();
-    let rows: any[] = [];
-    if (Array.isArray(json.results)) {
-      rows = json.results;
-    } else if (Array.isArray(json)) {
-      rows = json;
-    }
+    const rows: any[] = Array.isArray(json.results) ? json.results
+      : Array.isArray(json) ? json
+      : [];
   
     return rows.map((row: any): Announcement => ({
       id: row.id,
@@ -91,23 +116,39 @@
     }));
   }
   
+// ...
+export async function createAnnouncement(payload: {
+  title: string;
+  description: string;    // <— rename από content σε description
+  start_date: string;
+  end_date: string;
+  file?: string | null;
+}) {
+  await csrfFetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/announcements/`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }
+  );
+}
+// ...
+
+  
   /* =========================================================================
      ΨΗΦΟΦΟΡΙΕΣ
      ========================================================================= */
   
   export async function fetchVotes(): Promise<Vote[]> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/votes/`, {
-      cache: 'no-store',
-      credentials: 'include',
-    }).then(check);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/votes/`,
+      { cache: 'no-store', credentials: 'include' }
+    ).then(check);
   
     const json = await res.json();
-    let rows: any[] = [];
-    if (Array.isArray(json.results)) {
-      rows = json.results;
-    } else if (Array.isArray(json)) {
-      rows = json;
-    }
+    const rows: any[] = Array.isArray(json.results) ? json.results
+      : Array.isArray(json) ? json
+      : [];
   
     return rows.map((v: any): Vote => ({
       id: v.id,
@@ -119,10 +160,10 @@
   }
   
   export async function fetchMyVote(voteId: number): Promise<VoteSubmission> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/votes/${voteId}/my-submission/`, {
-      credentials: 'include',
-    }).then(check);
-  
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/votes/${voteId}/my-submission/`,
+      { credentials: 'include' }
+    ).then(check);
     return res.json();
   }
   
@@ -130,28 +171,51 @@
     voteId: number,
     choice: 'ΝΑΙ' | 'ΟΧΙ' | 'ΛΕΥΚΟ'
   ): Promise<void> {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/votes/${voteId}/vote/`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ choice }),
-    }).then(check);
+    await csrfFetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/votes/${voteId}/vote/`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ choice }),
+      }
+    );
   }
   
-  export async function fetchVoteResults(voteId: number): Promise<VoteResultsData> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/votes/${voteId}/results/`, {
-      credentials: 'include',
-    }).then(check);
-  
+  export async function fetchVoteResults(
+    voteId: number
+  ): Promise<VoteResultsData> {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/votes/${voteId}/results/`,
+      { credentials: 'include' }
+    ).then(check);
     return res.json();
+  }
+  
+  export async function createVote(payload: {
+    title: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    choices: string[];
+  }) {
+    await csrfFetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/votes/`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    );
   }
   
   /* =========================================================================
      ΑΙΤΗΜΑΤΑ
      ========================================================================= */
   
-  export async function fetchRequests(status: string = ''): Promise<UserRequest[]> {
-    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/user-requests/`);
+  export async function fetchRequests(
+    status: string = ''
+  ): Promise<UserRequest[]> {
+    const url = new URL(
+      `${process.env.NEXT_PUBLIC_API_URL}/user-requests/`
+    );
     if (status) url.searchParams.append('status', status);
   
     const res = await fetch(url.toString(), {
@@ -160,12 +224,9 @@
     }).then(check);
   
     const json = await res.json();
-    let rows: any[] = [];
-    if (Array.isArray(json.results)) {
-      rows = json.results;
-    } else if (Array.isArray(json)) {
-      rows = json;
-    }
+    const rows: any[] = Array.isArray(json.results) ? json.results
+      : Array.isArray(json) ? json
+      : [];
   
     return rows.map((r: any): UserRequest => ({
       id: r.id,
@@ -184,20 +245,15 @@
   }
   
   export async function fetchTopRequests(): Promise<UserRequest[]> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user-requests/top/`, {
-      cache: 'no-store',
-      credentials: 'include',
-    }).then(check);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/user-requests/top/`,
+      { cache: 'no-store', credentials: 'include' }
+    ).then(check);
   
     const json = await res.json();
-    let rows: any[] = [];
-    if (Array.isArray(json.results)) {
-      rows = json.results;
-    } else if (Array.isArray(json)) {
-      rows = json;
-    } else {
-      rows = [];
-    }
+    const rows: any[] = Array.isArray(json.results) ? json.results
+      : Array.isArray(json) ? json
+      : [];
   
     return rows.map((r: any): UserRequest => ({
       id: r.id,
@@ -214,28 +270,62 @@
     }));
   }
   
-
-  export async function toggleSupportRequest(id: number): Promise<{ status: string }> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user-requests/${id}/support/`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken') ?? '',
-      },
-    });
-  
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(errorText || 'Σφάλμα υποστήριξης αιτήματος');
-    }
-  
+  export async function toggleSupportRequest(
+    id: number
+  ): Promise<{ status: string }> {
+    const res = await csrfFetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/user-requests/${id}/support/`,
+      { method: 'POST' }
+    );
     return res.json();
   }
   
-  function getCookie(name: string): string | null {
-    const regex = new RegExp('(^| )' + name + '=([^;]+)');
-    const match = regex.exec(document.cookie);
-    return match ? match[2] : null;
+  export async function createUserRequest(payload: {
+    title: string;
+    description: string;
+    priority?: string;
+    status?: string;
+    type?: string;
+    is_urgent?: boolean;
+  }) {
+    await csrfFetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/user-requests/`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+  
+  /* =========================================================================
+     AUTH
+     ========================================================================= */
+  
+  export async function loginUser(
+    username: string,
+    password: string
+  ): Promise<void> {
+    await csrfFetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/login/`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+      }
+    );
+  }
+  
+  export async function logoutUser(): Promise<void> {
+    await csrfFetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/logout/`,
+      { method: 'POST' }
+    );
+  }
+  
+  export async function getCurrentUser(): Promise<User> {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/me/`,
+      { credentials: 'include' }
+    ).then(check);
+    return res.json();
   }
   

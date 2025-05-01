@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'requests',
     'votes',
     'api',
-    'user_requests',  # <-- νέο
+    'user_requests',  
+    'obligations',
 
 ]
 
@@ -184,15 +185,17 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Αν είσαι σε dev (ΧΩΡΙΣ HTTPS)
-SESSION_COOKIE_SAMESITE ='Lax'  #'None' με HTTPS
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-CSRF_COOKIE_SAMESITE = 'Lax'
-# Αν είσαι σε production (ΜΕ HTTPS) 
-# SESSION_COOKIE_SAMESITE = 'None'
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+# settings.py – DEV
+CSRF_COOKIE_SAMESITE = 'Lax'      # ή 'Strict'
+CSRF_COOKIE_SECURE   = False
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE   = False
+
+# settings.py – PROD
 # CSRF_COOKIE_SAMESITE = 'None'
+# CSRF_COOKIE_SECURE   = True
+# SESSION_COOKIE_SAMESITE = 'None'
+# SESSION_COOKIE_SECURE   = True
 
 AUTH_USER_MODEL = 'users.CustomUser'
 

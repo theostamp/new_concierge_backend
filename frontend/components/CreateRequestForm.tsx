@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createUserRequest } from '@/lib/api';   // ✅
 
 export default function CreateRequestForm() {
   const router = useRouter();
@@ -20,21 +21,10 @@ export default function CreateRequestForm() {
     setError(null);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user-requests/`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title, description, priority, status }),
-      });
-
-      if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.detail || 'Αποτυχία υποβολής');
-      }
-
+      await createUserRequest({ title, description, priority, status });
       router.push('/requests');
+
+
     } catch (err) {
       if (err instanceof Error) setError(err.message);
       else setError('Άγνωστο σφάλμα');
@@ -48,8 +38,9 @@ export default function CreateRequestForm() {
       <h1 className="text-xl font-bold">📝 Νέο Αίτημα</h1>
 
       <div>
-        <label className="block mb-1 font-medium">Τίτλος</label>
+        <label htmlFor="title" className="block mb-1 font-medium">Τίτλος</label>
         <input
+          id="title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -59,8 +50,9 @@ export default function CreateRequestForm() {
       </div>
 
       <div>
-        <label className="block mb-1 font-medium">Περιγραφή</label>
+        <label htmlFor="description" className="block mb-1 font-medium">Περιγραφή</label>
         <textarea
+          id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
@@ -70,8 +62,9 @@ export default function CreateRequestForm() {
       </div>
 
       <div>
-        <label className="block mb-1 font-medium">Προτεραιότητα</label>
+        <label htmlFor="priority" className="block mb-1 font-medium">Προτεραιότητα</label>
         <select
+          id="priority"
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
           className="w-full border border-gray-300 rounded-lg px-4 py-2"
@@ -83,8 +76,9 @@ export default function CreateRequestForm() {
       </div>
 
       <div>
-        <label className="block mb-1 font-medium">Κατάσταση</label>
+        <label htmlFor="status" className="block mb-1 font-medium">Κατάσταση</label>
         <select
+          id="status"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
           className="w-full border border-gray-300 rounded-lg px-4 py-2"

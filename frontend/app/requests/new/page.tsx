@@ -1,9 +1,10 @@
-// frontend/app/requests/new/page.tsx
+// C:\Users\Notebook\new_concierge\frontend\app\requests\new\page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ErrorMessage from '@/components/ErrorMessage';
+import { createUserRequest } from '@/lib/api';      // ✅ helper που στέλνει CSRF
 
 const LOCAL_STORAGE_KEY = 'new_request_draft';
 
@@ -17,23 +18,26 @@ export default function NewRequestPage() {
 
   const router = useRouter();
 
-  // 🔄 Φόρτωση πρόχειρων δεδομένων από localStorage
+  /* 🔄 Φόρτωση πρόχειρων δεδομένων */
   useEffect(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (saved) {
       try {
         const data = JSON.parse(saved);
-        setTitle(data.title || '');
-        setDescription(data.description || '');
+        setTitle(data.title ?? '');
+        setDescription(data.description ?? '');
       } catch {
-        // ignore corrupted data
+        /* ignore */
       }
     }
   }, []);
 
-  // 💾 Αυτόματη αποθήκευση σε localStorage
+  /* 💾 Αυτόματη αποθήκευση */
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ title, description }));
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify({ title, description })
+    );
   }, [title, description]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -48,36 +52,17 @@ export default function NewRequestPage() {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user-requests/`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          description,
-          type: requestType || null, // προαιρετικό, ανάλογα με το backend
-          is_urgent: isUrgent,       // στέλνεται μόνο αν το backend το υποστηρίζει
-        }),
+      await createUserRequest({
+        title: title.trim(),
+        description,
+        type: requestType || undefined,
+        is_urgent: isUrgent,
       });
 
-      if (!res.ok) {
-        throw new Error('Αποτυχία υποβολής αιτήματος');
-      }
-
       localStorage.removeItem(LOCAL_STORAGE_KEY);
-
-      const location = res.headers.get('Location');
-      if (location) {
-        const url = new URL(location);
-        router.push(url.pathname);
-      } else {
-        router.push('/requests');
-      }
-
+      router.push('/requests');
     } catch (err) {
-      setError((err as Error).message);
+      setError((err as Error).message ?? 'Αποτυχία υποβολής αιτήματος');
     } finally {
       setSubmitting(false);
     }
@@ -89,8 +74,11 @@ export default function NewRequestPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium">Τίτλος</label>
+          <label htmlFor="title" className="block text-sm font-medium">
+            Τίτλος
+          </label>
           <input
+            id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="mt-1 w-full border rounded-lg px-3 py-2"
@@ -99,8 +87,11 @@ export default function NewRequestPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Περιγραφή</label>
+          <label htmlFor="desc" className="block text-sm font-medium">
+            Περιγραφή
+          </label>
           <textarea
+            id="desc"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="mt-1 w-full border rounded-lg px-3 py-2 h-32"
@@ -109,8 +100,11 @@ export default function NewRequestPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Τύπος Αιτήματος</label>
+          <label htmlFor="rtype" className="block text-sm font-medium">
+            Τύπος Αιτήματος
+          </label>
           <select
+            id="rtype"
             value={requestType}
             onChange={(e) => setRequestType(e.target.value)}
             className="mt-1 w-full border rounded-lg px-3 py-2"
@@ -130,8 +124,7 @@ export default function NewRequestPage() {
               checked={isUrgent}
               onChange={(e) => setIsUrgent(e.target.checked)}
               className="accent-red-600"
-            />
-            Επείγον αίτημα
+            />Επείγον αίτημα
           </label>
         </div>
 
@@ -149,10 +142,18 @@ export default function NewRequestPage() {
       {/* 🔎 Προεπισκόπηση */}
       <div className="mt-8 border-t pt-4 text-sm text-gray-700">
         <h2 className="text-lg font-semibold mb-2">Προεπισκόπηση:</h2>
-        <p><strong>Τίτλος:</strong> {title || '—'}</p>
-        <p><strong>Περιγραφή:</strong> {description || '—'}</p>
-        <p><strong>Τύπος:</strong> {requestType || '—'}</p>
-        <p><strong>Επείγον:</strong> {isUrgent ? 'Ναι' : 'Όχι'}</p>
+        <p>
+          <strong>Τίτλος:</strong> {title || '—'}
+        </p>
+        <p>
+          <strong>Περιγραφή:</strong> {description || '—'}
+        </p>
+        <p>
+          <strong>Τύπος:</strong> {requestType || '—'}
+        </p>
+        <p>
+          <strong>Επείγον:</strong> {isUrgent ? 'Ναι' : 'Όχι'}
+        </p>
       </div>
     </div>
   );

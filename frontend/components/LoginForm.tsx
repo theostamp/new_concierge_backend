@@ -7,19 +7,27 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import useCsrf from '@/hooks/useCsrf';
+import useEnsureCsrf from '@/hooks/useEnsureCsrf';
+
+function getCookie(name: string): string | null {
+  const regex = new RegExp(`(^| )${name}=([^;]+)`);
+  const match = regex.exec(document.cookie);
+  return match ? match[2] : null;
+}
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const csrfToken = useCsrf();
 
-  if (!csrfToken) {
+  const csrfReady = useEnsureCsrf();
+  const csrfToken = getCookie('csrftoken');
+
+  if (!csrfReady || !csrfToken) {
     return (
-      <div className="max-w-sm mx-auto mt-10 text-center text-gray-500">
-        🛡️ Φόρτωση στοιχείων ασφαλείας...
+      <div className="text-center text-gray-500 mt-10">
+        🛡️ Φόρτωση ασφαλείας...
       </div>
     );
   }

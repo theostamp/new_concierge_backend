@@ -116,7 +116,7 @@ export default function RequestDetailPage() {
         <br />
         Κατάσταση: <strong>{request.status}</strong>
         <br />
-        Τύπος: <strong>{request.type || '—'}</strong>
+        Τύπος: <strong>{request.type ?? '—'}</strong>
         <br />
         Επείγον: <strong>{request.is_urgent ? 'Ναι' : 'Όχι'}</strong>
         <br />

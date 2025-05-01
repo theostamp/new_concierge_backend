@@ -18,14 +18,20 @@ class Vote(models.Model):
 
 
 class VoteSubmission(models.Model):
+    CHOICES = [
+        ("ΝΑΙ", "ΝΑΙ"),
+        ("ΟΧΙ", "ΟΧΙ"),
+        ("ΛΕΥΚΟ", "ΛΕΥΚΟ"),
+    ]
+
     vote = models.ForeignKey(Vote, on_delete=models.CASCADE, related_name='submissions')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    choice = models.CharField(max_length=50)  # π.χ. "ΝΑΙ", "ΟΧΙ", "ΛΕΥΚΟ"
+    choice = models.CharField(max_length=50, choices=CHOICES)
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('vote', 'user')  # ώστε κάθε χρήστης να ψηφίζει 1 φορά ανά ψηφοφορία
+        unique_together = ('vote', 'user')
+        ordering = ['-id']
 
     def __str__(self):
         return f'{self.user} ➜ {self.choice}'
-

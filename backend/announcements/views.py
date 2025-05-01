@@ -1,42 +1,39 @@
 # backend/announcements/views.py
-
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
+from rest_framework.exceptions import PermissionDenied
 from .models import Announcement
 from .serializers import AnnouncementSerializer
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from core.permissions import IsManagerOrSuperuser
-from django.utils import timezone
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.http import JsonResponse
-
-@ensure_csrf_cookie
-def get_csrf_token(request):
-    return JsonResponse({"message": "CSRF cookie set"})
-
 
 class AnnouncementViewSet(viewsets.ModelViewSet):
-    queryset = Announcement.objects.all()
+    """
+    list/retrieve: public (published μόνο αν anonymous)
+    create/update/delete: authenticated managers ή superusers
+    """
     serializer_class = AnnouncementSerializer
-
-    def get_permissions(self):
-        if self.action == 'list':
-            # Μόνο το list (GET /api/announcements/) είναι public
-            return [AllowAny()]
-        return [IsAuthenticated(), IsManagerOrSuperuser()]
 
     def get_queryset(self):
         user = self.request.user
+        qs = Announcement.objects.all()
         if user.is_authenticated:
             if user.is_superuser:
-                return Announcement.objects.all()
-            return Announcement.objects.filter(building__manager=user)
-        else:
-            return Announcement.objects.filter(published=True)
+                return qs
+            # ο manager βλέπει μόνο τα δικά του buildings
+            return qs.filter(building__manager=user)
+        # anonymous: μόνο published
+        return qs.filter(published=True)
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        # create/update/delete
+        return [permissions.IsAuthenticated(), IsManagerOrSuperuser()]
 
     def perform_create(self, serializer):
-        user = self.request.user
-        building = serializer.validated_data.get('building')
-        if not user.is_superuser and building.manager != user:
-            raise PermissionError("Δεν έχετε δικαίωμα να δημιουργήσετε ανακοίνωση για αυτό το κτίριο.")
+        # το building ελέγχθηκε ήδη στο serializer.validate_building
         serializer.save()
+
+    def perform_update(self, serializer):
+        # analogously
+        serializer.save()
+

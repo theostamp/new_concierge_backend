@@ -6,6 +6,15 @@ module.exports = {
     content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
   theme: {
   	extend: {
+		animation: {
+			'fade-in': 'fadeIn 0.3s ease-out',
+		  },
+		  keyframes: {
+			fadeIn: {
+			  from: { opacity: 0 },
+			  to: { opacity: 1 },
+			},
+		  },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

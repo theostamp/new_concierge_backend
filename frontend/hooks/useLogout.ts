@@ -1,32 +1,22 @@
-// frontend/hooks/useLogout.ts
-
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import useCsrf from './useCsrf';
+import { useAuth } from '@/contexts/AuthContext';
+import { logoutUser } from '@/lib/api';
 
 export default function useLogout() {
   const router = useRouter();
-  const csrfToken = useCsrf();
+  const { setUser } = useAuth();
 
   const logout = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/logout/`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken ?? '',
-        },
-      });
-
-      if (!res.ok) throw new Error('Σφάλμα αποσύνδεσης');
-
+      await logoutUser();         // καλεί το API
+      setUser(null);              // καθαρίζει το context
       toast.success('Αποσυνδεθήκατε');
-      router.push('/login');
+      router.replace('/dashboard');
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(err.message ?? 'Αποτυχία αποσύνδεσης');
     }
   };
 

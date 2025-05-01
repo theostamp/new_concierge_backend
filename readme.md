@@ -85,7 +85,7 @@ echo "# digital_concierge" >> README.md
 git init
 
 git add .
-git commit -m " Votes Ok"
+git commit -m " Votes Ok - μενουν αιτηματα"
 git branch -M main
 git remote add origin https://github.com/theostamp/new_concierge_backend.git
 git push -u origin main

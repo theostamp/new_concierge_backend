@@ -4,10 +4,12 @@ from rest_framework import serializers
 from .models import UserRequest
 
 class UserRequestSerializer(serializers.ModelSerializer):
-    created_by_username = serializers.CharField(source='created_by.username', read_only=True)
-    supporter_count = serializers.IntegerField(source='supporter_count', read_only=True)
+    created_by_username = serializers.CharField(
+        source='created_by.username',
+        read_only=True
+    )
+    supporter_count = serializers.SerializerMethodField()
     supporter_usernames = serializers.SerializerMethodField()
-    is_urgent = serializers.BooleanField(source='is_urgent', read_only=True)
 
     class Meta:
         model = UserRequest
@@ -16,18 +18,18 @@ class UserRequestSerializer(serializers.ModelSerializer):
             'title',
             'description',
             'status',
+            'type',
+            'is_urgent',
             'created_at',
             'updated_at',
-            'created_by',
             'created_by_username',
             'supporter_count',
             'supporter_usernames',
-            'is_urgent',
         ]
-        read_only_fields = [
-            'id', 'created_at', 'updated_at', 'created_by',
-            'created_by_username', 'supporter_count', 'supporter_usernames', 'is_urgent'
-        ]
+        read_only_fields = fields  # όλα τα παραπάνω είναι μόνο για ανάγνωση
+
+    def get_supporter_count(self, obj):
+        return obj.supporters.count()
 
     def get_supporter_usernames(self, obj):
-        return [user.username for user in obj.supporters.all()]
+        return obj.get_supporter_usernames()

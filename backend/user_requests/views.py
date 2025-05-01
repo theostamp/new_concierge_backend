@@ -40,6 +40,7 @@ class UserRequestViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        # Θέτουμε created_by = request.user αυτόματα
         serializer.save(created_by=self.request.user)
 
     def create(self, request, *args, **kwargs):

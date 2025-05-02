@@ -23,7 +23,7 @@ export default function LoginStatusIndicator() {
             Αποσύνδεση
           </Link>
         </p>
-      ) : (
+                ) : (
         <p>
           Δεν είστε συνδεδεμένος –{' '}
           <Link href="/login" className="underline text-blue-600 hover:text-blue-800">

@@ -29,7 +29,7 @@ class UserRequest(models.Model):
         ('technical', 'Τεχνικό'),
         ('other', 'Άλλο'),
     ]
-    type = models.CharField(max_length=20, choices=REQUEST_TYPE_CHOICES, blank=True, null=True)
+    type = models.CharField(max_length=20, choices=REQUEST_TYPE_CHOICES, blank=True)
 
 
     def __str__(self):
@@ -44,8 +44,8 @@ class UserRequest(models.Model):
         return self.supporters.count() >= 10
     
     def get_supporter_usernames(self):
-        return [user.username for user in self.supporters.all()]    
-
+        return [user.get_username() for user in self.supporters.all()] 
+    
 class UrgentRequestLog(models.Model):
     user_request = models.ForeignKey(UserRequest, on_delete=models.CASCADE, related_name='urgent_logs')
     triggered_at = models.DateTimeField(auto_now_add=True)

@@ -2,8 +2,8 @@
 *.pyc
 __pycache__/
 *.sqlite3
-.env
-*.env
+# .env
+# *.env
 *.db
 *.DS_Store
 *.egg-info/ 

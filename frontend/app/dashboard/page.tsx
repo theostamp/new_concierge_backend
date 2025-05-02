@@ -22,6 +22,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import Link from 'next/link';
+import AnnouncementsCarousel from '@/components/AnnouncementsCarousel';
 
 
 export default function DashboardPage() {
@@ -130,11 +131,16 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">📊 Πίνακας Ελέγχου</h1>
+    <div className="p-6 space-y-6 max-w-[85%] mx-auto">
+      {/* <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">📊 Πίνακας Ελέγχου</h1> */}
 
       {error && <ErrorMessage message="Αποτυχία φόρτωσης δεδομένων." />}
-
+      {announcements.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-xl font-bold mb-2">📰 Πρόσφατες Ανακοινώσεις</h2>
+          <AnnouncementsCarousel announcements={announcements} />
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link href="/announcements" className="p-4 rounded-xl shadow bg-white dark:bg-gray-800 hover:shadow-md transition block">
           <h2 className="text-lg font-semibold mb-2">📢 Ανακοινώσεις</h2>
@@ -268,23 +274,23 @@ export default function DashboardPage() {
           </Link>
         </div>
       )}
-  
-            {user && (
-              <div className="text-center mt-10">
-                <p className="text-sm text-gray-500">Είστε διαχειριστής ή ένοικος;</p>
-                <Link
-                  href="/logout"
-                  className="mt-2 inline-block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-                >
-                  Αποσύνδεση
-                </Link>
-              </div>
-            )}
-            {loading && (
-      <div className="text-center text-gray-500 mt-10">Φόρτωση...</div>
-    )}
-      
-      
+
+      {user && (
+        <div className="text-center mt-10">
+          <p className="text-sm text-gray-500">Είστε διαχειριστής ή ένοικος;</p>
+          <Link
+            href="/logout"
+            className="mt-2 inline-block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+          >
+            Αποσύνδεση
+          </Link>
+        </div>
+      )}
+      {loading && (
+        <div className="text-center text-gray-500 mt-10">Φόρτωση...</div>
+      )}
+
+
 
     </div>
   );

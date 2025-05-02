@@ -85,7 +85,7 @@ echo "# digital_concierge" >> README.md
 git init
 
 git add .
-git commit -m " Votes Ok - add .env -μενουν αιτηματα"
+git commit -m " env setup"
 git branch -M main
 git remote add origin https://github.com/theostamp/new_concierge_backend.git
 git push -u origin main
@@ -93,7 +93,7 @@ git push -u origin main
 git push --force
 
 cd frontend
-
+npm install
 npm run build
 npm run dev
 

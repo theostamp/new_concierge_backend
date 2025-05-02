@@ -20,7 +20,7 @@ type VoteResultsData = {
 };
 
 export default function VoteCard({ vote }: { readonly vote: Vote }) {
-  const [userChoice, setUserChoice] = useState<string | null>(null);
+  const [userChoice, setUserChoice] = useState<"ΝΑΙ" | "ΟΧΙ" | "ΛΕΥΚΟ" | null>(null);
   const [results, setResults] = useState<VoteResultsData | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ export default function VoteCard({ vote }: { readonly vote: Vote }) {
     }
   }, [userChoice, vote.id]);
 
-  async function handleVote(choice: string) {
+  async function handleVote(choice: "ΝΑΙ" | "ΟΧΙ" | "ΛΕΥΚΟ") {
     setLoading(true);
     setError('');
 

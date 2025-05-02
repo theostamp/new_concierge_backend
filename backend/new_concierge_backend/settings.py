@@ -16,7 +16,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'your_default_secret_key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
 
 # Application definition
 
@@ -180,8 +181,12 @@ CORS_EXPOSE_HEADERS = [
     "X-CSRFToken",
 ]  
 
+raw_csrf_origins = os.getenv("CSRF_ORIGINS", "localhost:3000").split(",")
+
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
+    f"http://{host.strip()}" for host in raw_csrf_origins
+] + [
+    f"https://{host.strip()}" for host in raw_csrf_origins
 ]
 
 # Αν είσαι σε dev (ΧΩΡΙΣ HTTPS)
@@ -210,17 +215,25 @@ DEFAULT_FROM_EMAIL = 'noreply@yourdomain.gr'
 
 import os
 
+
+CSRF_COOKIE_HTTPONLY = False  # Χρειάζεται για πρόσβαση από frontend (π.χ. axios)
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"  # Χρειάζεται για πρόσβαση από frontend (π.χ. axios)
 CSRF_TRUSTED_ORIGINS = [
-    f"http://{host.strip()}" for host in os.getenv("CSRF_ORIGINS", "localhost:3000").split(",")
-]
-CSRF_TRUSTED_ORIGINS += [
-    f"https://{host.strip()}" for host in os.getenv("CSRF_ORIGINS", "localhost:3000").split(",")
-]
-CSRF_TRUSTED_ORIGINS += [
-    f"http://{host.strip()}" for host in os.getenv("CSRF_ORIGINS", "localhost:3000").split(",")
+    "http://localhost:3000",
+    "https://yourdomain.gr",
 ]
 
-CSRF_COOKIE_HTTPONLY = False   # πρέπει να είναι False για να το διαβάζει JS
-CSRF_COOKIE_NAME = "csrftoken"
-CSRF_COOKIE_SAMESITE = "None"  # για να δουλεύει το CORS
-CSRF_COOKIE_SECURE = False  # πρέπει να είναι True αν έχεις HTTPS   
+
+IS_PRODUCTION = os.getenv("ENV", "development") == "production"
+
+if IS_PRODUCTION:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = "None"
+    SESSION_COOKIE_SAMESITE = "None"
+else:
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SAMESITE = "Lax"

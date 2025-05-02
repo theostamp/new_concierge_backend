@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Περιμένουμε να σηκωθεί το database container
-echo "Waiting for postgres..."
+# Περιμένουμε τη βάση δεδομένων
+echo "Waiting for PostgreSQL..."
 
 while ! nc -z db 5432; do
   sleep 0.1
@@ -12,8 +12,8 @@ echo "PostgreSQL started"
 # Εκτελούμε migrations
 python manage.py migrate
 
-# (προαιρετικά αν θες) συλλογή static files
+# (προαιρετικά) Συλλογή στατικών αρχείων
 # python manage.py collectstatic --noinput
 
-# Ξεκινάμε τον server
+# Εκκίνηση του Django server
 python manage.py runserver 0.0.0.0:8000

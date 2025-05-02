@@ -29,7 +29,12 @@ class UserRequest(models.Model):
         ('technical', 'Τεχνικό'),
         ('other', 'Άλλο'),
     ]
-    type = models.CharField(max_length=20, choices=REQUEST_TYPE_CHOICES, blank=True)
+    type = models.CharField(
+        max_length=20,
+        choices=REQUEST_TYPE_CHOICES,
+        blank=True,
+        null=True,
+    )
 
 
     def __str__(self):

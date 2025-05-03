@@ -26,10 +26,10 @@ export default function EditRequestPage() {
         });
         if (!res.ok) throw new Error('Αποτυχία φόρτωσης αιτήματος');
         const data = await res.json();
-        setTitle(data.title || '');
-        setDescription(data.description || '');
-        setRequestType(data.type || '');
-        setIsUrgent(data.is_urgent || false);
+        setTitle(data.title ?? '');
+        setDescription(data.description ?? '');
+        setRequestType(data.type ?? '');
+        setIsUrgent(data.is_urgent ?? false);
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -78,8 +78,9 @@ export default function EditRequestPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium">Τίτλος</label>
+          <label htmlFor="title" className="block text-sm font-medium">Τίτλος</label>
           <input
+            id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="mt-1 w-full border rounded-lg px-3 py-2"
@@ -88,8 +89,9 @@ export default function EditRequestPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Περιγραφή</label>
+          <label htmlFor="description" className="block text-sm font-medium">Περιγραφή</label>
           <textarea
+            id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="mt-1 w-full border rounded-lg px-3 py-2 h-32"
@@ -98,8 +100,9 @@ export default function EditRequestPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Τύπος Αιτήματος</label>
+          <label htmlFor="requestType" className="block text-sm font-medium">Τύπος Αιτήματος</label>
           <select
+            id="requestType"
             value={requestType}
             onChange={(e) => setRequestType(e.target.value)}
             className="mt-1 w-full border rounded-lg px-3 py-2"
@@ -119,7 +122,7 @@ export default function EditRequestPage() {
               checked={isUrgent}
               onChange={(e) => setIsUrgent(e.target.checked)}
               className="accent-red-600"
-            />
+            />{' '}
             Επείγον αίτημα
           </label>
         </div>

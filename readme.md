@@ -1,6 +1,19 @@
 cd C:\Users\thodo\digital_concierge\frontend    
 
+npm install next@14
+npm install react@18.2.0 react-dom@18.2.0
+
+
+cd frontend
+Remove-Item -Recurse -Force .next
+npm run build
 npm run dev
+
+<!-- προτεινόμενο flow σε production ή μέσα σε Docker. -->
+npm ci
+npm run build
+npm run start
+
 
 <!-- diagrafh olvn  -->
 
@@ -18,24 +31,8 @@ docker compose up -d
 find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
 
 
-Get-ChildItem -Recurse -Include *.py -Exclude __init__.py | Where-Object { $_.FullName -like "*migrations*" } | Remove-Item
 
-# Sto DOCKER
-
-chmod +x scripts/full_reset.sh
-./scripts/full_reset.sh
-
-
-
-cd C:\Users\thodo\digital_concierge
-.\setup-vscode-settings.ps1
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-
-
-.\venv\Scripts\activate
-python manage.py exporttree --output dev_tree.md
-
-
+-
 
 # Δημιουργούμε όλες τις απαραίτητες migrations
 python manage.py makemigrations
@@ -74,6 +71,9 @@ python manage.py delete_tenant --schema=test
 # κάνει migrate ΟΛΑ τα νέα migrations μόνο μέσα στο schema ert, χωρίς να πειράξει άλλους tenants ή το public.
 python manage.py migrate_tenant --schema=test
 
+python manage.py migrate
+python manage.py makemigrations
+python manage.py createsuperuser
 
 bash scripts/setup_shared.sh
 
@@ -85,7 +85,7 @@ echo "# digital_concierge" >> README.md
 git init
 
 git add .
-git commit -m " env setup"
+git commit -m " ok exc-votes"
 git branch -M main
 git remote add origin https://github.com/theostamp/new_concierge_backend.git
 git push -u origin main
@@ -126,23 +126,12 @@ docker system prune -a --volumes
 docker volume rm $(docker volume ls -q)
 docker network rm $(docker network ls -q)
 
-
 docker-compose down
 docker-compose up --build
 
 
-# Εάν έχεις standalone containers που δεν είναι μέρος του docker-compose
 
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
 
-# Διαγραφή volumes που δεν χρησιμοποιούνται
-
-docker volume prune -f
-
-# Διαγραφή δικτύων που δημιουργήθηκαν από το Docker Compose
-
-docker network prune -f
 
 docker image prune -a
 docker image prune -a -f
@@ -156,3 +145,6 @@ docker system prune -a
 
 docker-compose down
 docker-compose up --build
+
+
+python manage.py exporttree --output dev_tree.md

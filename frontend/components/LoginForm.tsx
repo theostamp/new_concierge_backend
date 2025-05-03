@@ -1,6 +1,8 @@
+// C:\Users\Notebook\new_concierge\frontend\components\LoginForm.tsx
+
 'use client';
 
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -9,7 +11,10 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import useEnsureCsrf from '@/hooks/useEnsureCsrf';
 
+
+
 function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null; // ✅ ασφάλεια σε SSR
   const regex = new RegExp(`(^| )${name}=([^;]+)`);
   const match = regex.exec(document.cookie);
   return match ? match[2] : null;
@@ -19,10 +24,16 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [csrfToken, setCsrfToken] = useState<string | null>(null);
+  const csrfReady = useEnsureCsrf();
   const router = useRouter();
 
-  const csrfReady = useEnsureCsrf();
-  const csrfToken = getCookie('csrftoken');
+  useEffect(() => {
+    if (csrfReady) {
+      const token = getCookie('csrftoken');
+      setCsrfToken(token);
+    }
+  }, [csrfReady]);
 
   if (!csrfReady || !csrfToken) {
     return (

@@ -1,15 +1,9 @@
+// frontend/components/CsrfInitializer.tsx
 'use client';
 
-import { useEffect } from 'react';
+import useCsrf from '@/hooks/useCsrf';
 
 export default function CsrfInitializer() {
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/csrf/`, {
-      credentials: 'include',
-    }).catch((err) => {
-      console.warn('CSRF token fetch failed:', err);
-    });
-  }, []);
-
+  useCsrf();
   return null;
 }

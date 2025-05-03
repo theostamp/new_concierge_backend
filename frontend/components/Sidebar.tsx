@@ -9,11 +9,14 @@ import LogoutButton from '@/components/LogoutButton';
 import useCsrf from '@/hooks/useCsrf';
 import { useAuth } from '@/contexts/AuthContext';
 
+
+import { Home, Megaphone, Vote, ClipboardList } from 'lucide-react'; // ή heroicons
+
 const links = [
-  { href: '/dashboard', label: 'Πίνακας Ελέγχου' },
-  { href: '/announcements', label: 'Ανακοινώσεις' },
-  { href: '/votes', label: 'Ψηφοφορίες' },
-  { href: '/requests', label: 'Αιτήματα' },
+  { href: '/dashboard', label: 'Πίνακας Ελέγχου', icon: <Home className="w-4 h-4 mr-2" /> },
+  { href: '/announcements', label: 'Ανακοινώσεις', icon: <Megaphone className="w-4 h-4 mr-2" /> },
+  { href: '/votes', label: 'Ψηφοφορίες', icon: <Vote className="w-4 h-4 mr-2" /> },
+  { href: '/requests', label: 'Αιτήματα', icon: <ClipboardList className="w-4 h-4 mr-2" /> },
 ];
 
 export function Sidebar() {

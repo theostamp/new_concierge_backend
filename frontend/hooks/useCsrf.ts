@@ -1,38 +1,27 @@
 // frontend/hooks/useCsrf.ts
-
-'use client';
-
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { getBaseUrl } from '@/lib/config';
 
 export default function useCsrf() {
-  const [csrfToken, setCsrfToken] = useState<string | null>(null);
-
   useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/csrf/`, {
-          credentials: 'include',
-        });
-        if (!res.ok) throw new Error('CSRF fetch failed');
-
-        await res.json();
-        const token = getCookie('csrftoken');
-        setCsrfToken(token);
-      } catch (err) {
-        console.error('CSRF error:', err);
+    async function fetchToken() {
+      const baseUrl = getBaseUrl();
+      if (!baseUrl) {
+        console.error('❌ NEXT_PUBLIC_API_BASE_URL is not set');
+        return;
       }
-    };
+      const res = await fetch(`${baseUrl}/csrf/`, {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        console.error('❌ CSRF fetch failed:', res.status, await res.text());
+        throw new Error('CSRF fetch failed');
+      }
+    }
 
-    fetchToken();
+    fetchToken().catch((err) => {
+      // προαιρετικά log
+      console.error(err);
+    });
   }, []);
-
-  return csrfToken;
-
-}
-
-function getCookie(name: string): string | null {
-  const regex = new RegExp('(^| )' + name + '=([^;]+)');
-  const match = regex.exec(document.cookie);
-  if (match) return match[2];
-  return null;
 }
